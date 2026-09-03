@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINECRAFT RGB GRADIENT GENERATOR</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap');
+
+        @font-face {
+            font-family: 'MinecraftKR';
+            src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body, input, select, textarea, button, span, .mc-font {
+            font-family: 'MinecraftKR', 'Silkscreen', monospace !important;
+            letter-spacing: 0.5px;
+        }
+
+        body {
+            background: radial-gradient(circle at 50% 30%, #111827 0%, #030712 100%);
+            min-height: 100vh;
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, #38bdf8, #c084fc, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(192, 132, 252, 0.4);
+        }
+
+        .copyright-text {
+            background: linear-gradient(90deg, #c084fc, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+        }
+
+        .copyright-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(168, 85, 247, 0.2);
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.1);
+        }
+
+        .custom-input:focus {
+            outline: none;
+            border-color: #a855f7;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+        }
+
+        .mc-bold-active {
+            text-shadow: 1px 0px 0px currentColor, 0px 1px 0px currentColor, 1px 1px 0px rgba(0, 0, 0, 0.15) !important;
+            letter-spacing: 2.5px !important;
+            image-rendering: pixelated;
+            -webkit-font-smoothing: none;
+            -moz-osx-font-smoothing: none;
+        }
+
+        .color-picker-wrapper input[type="color"] {
+            -webkit-appearance: none;
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            cursor: pointer;
+            background: none;
+        }
+        .color-picker-wrapper input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        .color-picker-wrapper input[type="color"]::-webkit-color-swatch {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+        }
+
+        .style-checkbox {
+            appearance: none;
+            background-color: #1e293b;
+            border: 1px solid #475569;
+            padding: 9px;
+            border-radius: 6px;
+            display: inline-block;
+            position: relative;
+            cursor: pointer;
+        }
+        .style-checkbox:checked {
+            background-color: #a855f7;
+            border-color: #c084fc;
+        }
+        .style-checkbox:checked:after {
+            content: '\2714';
+            font-size: 12px;
+            position: absolute;
+            top: 0;
+            left: 3px;
+            color: #fff;
+        }
+    </style>
+</head>
+<body class="text-slate-200 py-12 px-4 flex flex-col items-center justify-center">
+
+    <div class="max-w-4xl w-full space-y-8">
+        <header class="text-center space-y-2">
+            <h1 class="text-3xl md:text-5xl font-bold tracking-wider gradient-text">RGB GRADIENTER</h1>
+            <p class="text-xs md:text-sm tracking-widest text-slate-400 uppercase">마인크래프트 RGB 그라데이션 시스템</p>
+        </header>
+
+        <main class="glass-panel rounded-2xl p-6 md:p-8 space-y-6">
+            <!-- INPUT -->
+            <div class="space-y-2">
+                <label for="inputText" class="block text-xs font-bold tracking-wider text-slate-400">INPUT TEXT</label>
+                <input type="text" id="inputText" value="마인크래프트 MINECRAFT" 
+                    class="custom-input w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-3.5 text-white transition-all text-lg font-bold shadow-inner">
+            </div>
+
+            <!-- COLOR PALETTE -->
+            <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                    <label class="block text-xs font-bold tracking-wider text-slate-400">COLOR PALETTE</label>
+                    <div class="flex gap-2">
+                        <button id="btnRandom" class="text-xs bg-purple-600/20 hover:bg-purple-600/40 border border-purple-500/30 px-3 py-1.5 rounded-lg text-purple-300 transition-all">
+                            🎲 RANDOM
+                        </button>
+                        <button id="btnAddColor" class="text-xs bg-emerald-600/20 hover:bg-emerald-600/40 border border-emerald-500/30 px-3 py-1.5 rounded-lg text-emerald-300 transition-all">
+                            ➕ ADD COLOR
+                        </button>
+                    </div>
+                </div>
+                <div id="colorContainer" class="flex flex-wrap gap-4 bg-slate-950/40 p-4 rounded-xl border border-slate-900/60 shadow-inner"></div>
+            </div>
+
+            <!-- STYLES -->
+            <div class="space-y-3">
+                <label class="block text-xs font-bold tracking-wider text-slate-400">TEXT STYLES</label>
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 bg-slate-950/40 p-4 rounded-xl border border-slate-900/60 shadow-inner text-sm">
+                    <label class="flex items-center gap-2.5 cursor-pointer select-none">
+                        <input type="checkbox" id="styleBold" class="style-checkbox update-trigger">
+                        <span>볼드 (&l)</span>
+                    </label>
+                    <label class="flex items-center gap-2.5 cursor-pointer select-none">
+                        <input type="checkbox" id="styleItalic" class="style-checkbox update-trigger">
+                        <span class="italic">기울기 (&o)</span>
+                    </label>
+                    <label class="flex items-center gap-2.5 cursor-pointer select-none">
+                        <input type="checkbox" id="styleUnderline" class="style-checkbox update-trigger">
+                        <span class="underline">밑줄 (&n)</span>
+                    </label>
+                    <label class="flex items-center gap-2.5 cursor-pointer select-none">
+                        <input type="checkbox" id="styleStrikethrough" class="style-checkbox update-trigger">
+                        <span class="line-through">취소선 (&m)</span>
+                    </label>
+                    <label class="flex items-center gap-2.5 cursor-pointer select-none col-span-2 sm:col-span-1">
+                        <input type="checkbox" id="styleObfuscated" class="style-checkbox update-trigger">
+                        <span class="text-purple-400">난독화 (&k)</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- OUTPUT FORMAT -->
+            <div class="space-y-3">
+                <label for="outputFormat" class="block text-xs font-bold tracking-wider text-slate-400">OUTPUT FORMAT</label>
+                <select id="outputFormat" class="custom-input update-trigger w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-3.5 text-slate-200 transition-all text-sm">
+                    <option value="gradient-hash-bracket">&lt;#RRGGBB&gt; Text (✨ 추천 - CMI / Essentials)</option>
+                    <option value="amp-hash">&amp;#RRGGBB Text (✨ 추천 - 최신 플러그인 대다수)</option>
+                    <option value="gradient-bracket">&lt;color:#RRGGBB&gt; Text</option>
+                    <option value="legacy-amp">&amp;x&amp;R&amp;R&amp;G&amp;G&amp;B&amp;B (순정 마인크래프트)</option>
+                    <option value="brace">{#RRGGBB} Text</option>
+                    <option value="hash">#RRGGBB Text</option>
+                </select>
+            </div>
+
+            <hr class="border-slate-900">
+
+            <!-- PREVIEW -->
+            <div class="space-y-2">
+                <label class="block text-xs font-bold tracking-wider text-slate-400">LIVE PREVIEW</label>
+                <div class="w-full min-h-[95px] bg-slate-950/90 rounded-xl p-4 flex items-center justify-center border border-slate-900 shadow-inner overflow-x-auto">
+                    <span id="previewText" class="text-2xl md:text-3xl font-bold tracking-wide whitespace-nowrap"></span>
+                </div>
+            </div>
+
+            <!-- GENERATED CODE -->
+            <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                    <label for="outputCode" class="block text-xs font-bold tracking-wider text-slate-400">GENERATED CODE</label>
+                    <button id="btnCopy" class="text-xs bg-slate-800 hover:bg-slate-700 border border-slate-700 px-3 py-1.5 rounded-lg text-slate-300 transition-all active:scale-95">
+                        📋 COPY
+                    </button>
+                </div>
+                <textarea id="outputCode" readonly rows="4" 
+                    class="w-full bg-slate-950/95 border border-slate-900 rounded-xl px-4 py-3 text-emerald-400 text-xs focus:outline-none resize-none shadow-inner tracking-tight"></textarea>
+            </div>
+        </main>
+
+        <!-- GUIDE -->
+        <section class="glass-panel rounded-2xl p-6 md:p-8 space-y-4">
+            <h2 class="text-xl font-bold text-purple-400 border-b border-slate-800 pb-2">📖 사용 가이드 (How To Use)</h2>
+            <div class="text-sm text-slate-300 space-y-3 leading-relaxed">
+                <p>본 시스템은 마인크래프트 내에서 사용되는 다양한 헥사(Hex) RGB 코드를 쉽고 정밀하게 조합하여 아름다운 연출을 도와주는 도구입니다.</p>
+                <ol class="list-decimal pl-5 space-y-2 text-slate-400">
+                    <li><strong class="text-slate-200">텍스트 입력:</strong> <code class="text-purple-300 bg-slate-950 px-1.5 py-0.5 rounded">INPUT TEXT</code> 란에 인게임에 적용하고 싶은 문구를 작성합니다. 한글 도트 폰트를 지원합니다.</li>
+                    <li><strong class="text-slate-200">컬러 팔레트 지정:</strong> 기본 3가지 색상 외에 <code class="text-emerald-300 bg-slate-950 px-1.5 py-0.5 rounded">➕ ADD COLOR</code>를 눌러 멀티 그라데이션 포인트를 무제한으로 확장할 수 있습니다.</li>
+                    <li><strong class="text-slate-200">스타일 및 포맷 선택:</strong> 마인크래프트 플러그인 환경(CMI, EssentialsX, 순정 등)에 호환되는 올바른 출력 포맷을 지정합니다.</li>
+                    <li><strong class="text-slate-200">복사 및 적용:</strong> 하단의 복사 버튼을 누르고 게임 내 채팅창, 칭호 설정창, 혹은 서버 컨피그(Config) 파일에 붙여넣어 즉시 적용합니다.</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section class="glass-panel rounded-2xl p-6 md:p-8 space-y-4">
+            <h2 class="text-xl font-bold text-purple-400 border-b border-slate-800 pb-2">❓ 자주 묻는 질문 (FAQ)</h2>
+            <div class="space-y-4 text-sm">
+                <div class="space-y-1">
+                    <h3 class="font-bold text-slate-200">Q1. 볼드(&amp;l) 효과를 주니 글자가 겹쳐 보여요. 에러인가요?</h3>
+                    <p class="text-slate-400 leading-relaxed">아닙니다. 웹 브라우저 화면의 렌더링 방식에 따른 일시적 현상일 뿐이며, <strong class="text-emerald-400">실제 생성된 코드를 복사하여 마인크래프트 게임 내에 적용하시면 정상적으로 출력</strong>됩니다.</p>
+                </div>
+                <div class="space-y-1">
+                    <h3 class="font-bold text-slate-200">Q2. 어떤 출력 포맷 형식을 선택해야 하나요?</h3>
+                    <p class="text-slate-400 leading-relaxed">최신 플러그인(CMI, EssentialsX 등) 환경은 대다수 <code class="text-slate-300 bg-slate-900 px-1 py-0.5 rounded">&lt;#RRGGBB&gt;</code> 혹은 <code class="text-slate-300 bg-slate-900 px-1 py-0.5 rounded">&amp;#RRGGBB</code> 구조를 채택합니다. 플러그인이 없는 바닐라 순정 상태라면 <code class="text-slate-300 bg-slate-900 px-1 py-0.5 rounded">&amp;x</code> 방식을 선택하세요.</p>
+                </div>
+                <div class="space-y-1">
+                    <h3 class="font-bold text-slate-200">Q3. 입력한 데이터가 외부 서버에 저장되나요?</h3>
+                    <p class="text-slate-400 leading-relaxed">아닙니다. 모든 연산은 클라이언트 브라우저 내부에서 작동하며 외부 서버로 전송되지 않습니다.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="copyright-panel rounded-xl p-4 text-center tracking-wider select-none max-w-2xl mx-auto space-y-2">
+            <p class="text-sm md:text-base font-bold text-slate-300">
+                © 2026 <span class="copyright-text font-extrabold text-base md:text-lg">Team.MINEnet</span>. All rights reserved.
+            </p>
+            <p class="text-xs text-purple-300/60 font-bold tracking-normal">
+                본 시스템의 권한은 마인크래프트 커뮤니티 '마인넷’에 있으며 무단 도용을 엄격히 금지합니다.
+            </p>
+            <div class="flex justify-center gap-4 pt-2 text-[11px] text-slate-500 font-bold">
+                <button class="modal-open-btn hover:text-purple-400 transition-colors" data-target="privacyModal">개인정보처리방침 (Privacy Policy)</button>
+                <span>|</span>
+                <button class="modal-open-btn hover:text-purple-400 transition-colors" data-target="termsModal">이용약관 (Terms of Service)</button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- MODALS -->
+    <div id="privacyModal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-xl max-w-lg w-full max-h-[80vh] overflow-y-auto space-y-4 text-xs text-slate-400">
+            <h3 class="text-sm font-bold text-slate-200">개인정보처리방침 (Privacy Policy)</h3>
+            <p>마인넷이 운영하는 본 웹서비스는 정보통신망법 규정을 준수합니다. 본 도구는 오직 클라이언트 브라우저 단에서 스크립트 연산만을 수행하며, 어떠한 회원가입 유도, 쿠키를 통한 추적 정보 수집 및 개인 식별 정보를 서버 저장소에 수집 및 저장하지 않음을 명시합니다.</p>
+            <button class="modal-close-btn w-full py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg transition-colors" data-target="privacyModal">닫기</button>
+        </div>
+    </div>
+
+    <div id="termsModal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-xl max-w-lg w-full max-h-[80vh] overflow-y-auto space-y-4 text-xs text-slate-400">
+            <h3 class="text-sm font-bold text-slate-200">이용약관 (Terms of Service)</h3>
+            <p>본 서비스는 전 세계 모든 마인크래프트 유저들을 위해 무료로 제공되는 기능입니다. 이용자는 본 시스템을 자유롭게 활용할 수 있으나, 비정상적인 트래픽 공격 등을 가할 수 없습니다. 시스템 코드 구조 및 UI 컴포넌트 조합의 지식재산권은 마인넷 커뮤니티에 귀속됩니다.</p>
+            <button class="modal-close-btn w-full py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg transition-colors" data-target="termsModal">닫기</button>
+        </div>
+    </div>
+
+    <script>
+        let colors = ['#38bdf8', '#c084fc', '#f472b6'];
+        let obfuscationInterval = null;
+
+        const getRandomColor = () => '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : null;
+        }
+
+        function rgbToHex(r, g, b) {
+            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+        }
+
+        function getMultiGradientColor(factor) {
+            if (colors.length === 1) return hexToRgb(colors[0]);
+            const segmentCount = colors.length - 1;
+            const scaledFactor = factor * segmentCount;
+            const index = Math.floor(scaledFactor);
+            if (index >= segmentCount) return hexToRgb(colors[colors.length - 1]);
+            
+            const c1 = hexToRgb(colors[index]);
+            const c2 = hexToRgb(colors[index + 1]);
+            const localFactor = scaledFactor - index;
+
+            return {
+                r: Math.round(c1.r + localFactor * (c2.r - c1.r)),
+                g: Math.round(c1.g + localFactor * (c2.g - c1.g)),
+                b: Math.round(c1.b + localFactor * (c2.b - c1.b))
+            };
+        }
+
+        function renderColorPickers() {
+            const container = document.getElementById('colorContainer');
+            container.innerHTML = '';
+            colors.forEach((color, idx) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'color-picker-wrapper flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-800';
+                
+                const input = document.createElement('input');
+                input.type = 'color';
+                input.value = color;
+                input.addEventListener('input', (e) => { 
+                    colors[idx] = e.target.value; 
+                    updateGradient(); 
+                });
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.innerHTML = '✕';
+                if (colors.length <= 2) {
+                    deleteBtn.disabled = true;
+                    deleteBtn.className = 'text-xs text-slate-700 font-bold px-1 cursor-not-allowed';
+                } else {
+                    deleteBtn.className = 'text-xs text-slate-500 hover:text-rose-400 font-bold px-1 transition-colors';
+                    deleteBtn.addEventListener('click', () => { 
+                        colors.splice(idx, 1); 
+                        renderColorPickers(); 
+                        updateGradient(); 
+                    });
+                }
+
+                wrapper.appendChild(input);
+                wrapper.appendChild(deleteBtn);
+                container.appendChild(wrapper);
+            });
+        }
+
+        function addColorPoint() {
+            colors.push(getRandomColor());
+            renderColorPickers();
+            updateGradient();
+        }
+
+        function randomizeAllColors() {
+            colors = colors.map(() => getRandomColor());
+            renderColorPickers();
+            updateGradient();
+        }
+
+        function updateGradient() {
+            const text = document.getElementById('inputText').value;
+            const format = document.getElementById('outputFormat').value;
+            const previewTarget = document.getElementById('previewText');
+            const outputTarget = document.getElementById('outputCode');
+
+            if (!text) {
+                previewTarget.innerHTML = '';
+                outputTarget.value = '';
+                return;
+            }
+
+            const isBold = document.getElementById('styleBold').checked;
+            const isItalic = document.getElementById('styleItalic').checked;
+            const isUnderline = document.getElementById('styleUnderline').checked;
+            const isStrikethrough = document.getElementById('styleStrikethrough').checked;
+            const isObfuscated = document.getElementById('styleObfuscated').checked;
+
+            let stylePrefix = '';
+            if (isObfuscated) stylePrefix += '&k';
+            if (isBold) stylePrefix += '&l';
+            if (isStrikethrough) stylePrefix += '&m';
+            if (isUnderline) stylePrefix += '&n';
+            if (isItalic) stylePrefix += '&o';
+
+            let previewClasses = '';
+            const textDecorations = [];
+
+            if (isItalic) previewClasses += ' italic';
+            if (isBold) previewClasses += ' mc-bold-active';
+            if (isObfuscated) previewClasses += ' obfuscated-char';
+
+            if (isUnderline) textDecorations.push('underline');
+            if (isStrikethrough) textDecorations.push('line-through');
+            const previewStyles = textDecorations.length ? `text-decoration: ${textDecorations.join(' ')};` : '';
+
+            let previewHtml = '';
+            let codeResult = '';
+            const len = text.length;
+
+            for (let i = 0; i < len; i++) {
+                const factor = len > 1 ? i / (len - 1) : 0;
+                const rgb = getMultiGradientColor(factor);
+                const currentHex = rgbToHex(rgb.r, rgb.g, rgb.b);
+                const cleanHex = currentHex.replace('#', '');
+
+                previewHtml += `<span style="color: ${currentHex}; ${previewStyles}" class="${previewClasses}" data-orig="${text[i]}">${text[i]}</span>`;
+
+                switch (format) {
+                    case 'gradient-hash-bracket': codeResult += `<${currentHex}>`; break;
+                    case 'amp-hash': codeResult += `&${currentHex}`; break;
+                    case 'gradient-bracket': codeResult += `<color:${currentHex}>`; break;
+                    case 'legacy-amp':
+                        codeResult += '&x' + cleanHex.toLowerCase().split('').map(c => '&' + c).join('');
+                        break;
+                    case 'brace': codeResult += `{${currentHex}}`; break;
+                    case 'hash': codeResult += `${currentHex}`; break;
+                }
+                codeResult += stylePrefix + text[i];
+            }
+
+            previewTarget.innerHTML = previewHtml;
+            outputTarget.value = codeResult;
+
+            handleObfuscationLogic(isObfuscated);
+        }
+
+        function handleObfuscationLogic(start) {
+            clearInterval(obfuscationInterval);
+            if (!start) return;
+
+            const chars = 'ABCDEFGHIJKLMNOPrSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789가나다라마바사아자차카타파하⚔⚙✦';
+            obfuscationInterval = setInterval(() => {
+                document.querySelectorAll('.obfuscated-char').forEach(el => {
+                    el.innerText = chars[Math.floor(Math.random() * chars.length)];
+                });
+            }, 60);
+        }
+
+        function copyToClipboard() {
+            const copyText = document.getElementById("outputCode");
+            if (!copyText.value) return;
+            navigator.clipboard.writeText(copyText.value).then(() => alert("COPIED!"));
+        }
+
+        function toggleModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) modal.classList.toggle('hidden');
+        }
+
+        function printCopyrightNotice() {
+            console.log(
+                "%c[ MINEnet Assets ]%c\n\nThis system is protected by copyright law.\nOwned by Minecraft Server 'MINEnet'.\n\n본 시스템의 권한은 '마인넷'에 있으며 서버 통신 없이 단독 구동됩니다.",
+                "color: #a855f7; font-size: 20px; font-weight: bold; font-family: monospace; text-shadow: 0 0 10px rgba(168,85,247,0.4);",
+                "color: #94a3b8; font-size: 12px; font-family: monospace;"
+            );
+        }
+
+        // Event Listeners Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('inputText').addEventListener('input', updateGradient);
+            document.getElementById('btnRandom').addEventListener('click', randomizeAllColors);
+            document.getElementById('btnAddColor').addEventListener('click', addColorPoint);
+            document.getElementById('btnCopy').addEventListener('click', copyToClipboard);
+
+            document.querySelectorAll('.update-trigger').forEach(el => {
+                el.addEventListener('change', updateGradient);
+            });
+
+            document.querySelectorAll('.modal-open-btn, .modal-close-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const targetId = e.currentTarget.getAttribute('data-target');
+                    toggleModal(targetId);
+                });
+            });
+
+            renderColorPickers();
+            updateGradient();
+            printCopyrightNotice();
+        });
+    </script>
+</body>
+</html>
